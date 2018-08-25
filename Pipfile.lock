@@ -1,7 +1,20 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "68309cd71a258c30a39567fce09a09ad5c4ff0bdc85b6fba22b47598c985c883"
+            "sha256": "eacc3a47bf96225c211c5b3833e4380188c0a832b3bd7f8625aa4cb68da4235c"
+        },
+        "host-environment-markers": {
+            "implementation_name": "cpython",
+            "implementation_version": "3.5.2",
+            "os_name": "posix",
+            "platform_machine": "x86_64",
+            "platform_python_implementation": "CPython",
+            "platform_release": "4.9.4-galliumos-braswell",
+            "platform_system": "Linux",
+            "platform_version": "#1 SMP PREEMPT galliumos2 Thu Feb 23 01:58:04 UTC 2017",
+            "python_full_version": "3.5.2",
+            "python_version": "3.5",
+            "sys_platform": "linux"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -16,20 +29,49 @@
         ]
     },
     "default": {
+        "astroid": {
+            "hashes": [],
+            "version": "==2.0.4"
+        },
         "django": {
-            "hashes": [
-                "sha256:7f246078d5a546f63c28fc03ce71f4d7a23677ce42109219c24c9ffb28416137",
-                "sha256:ea50d85709708621d956187c6b61d9f9ce155007b496dd914fdb35db8d790aec"
-            ],
-            "index": "pypi",
+            "hashes": [],
             "version": "==2.1"
         },
+        "futures": {
+            "hashes": [],
+            "version": "==3.1.1"
+        },
+        "isort": {
+            "hashes": [],
+            "version": "==4.3.4"
+        },
+        "lazy-object-proxy": {
+            "hashes": [],
+            "version": "==1.3.1"
+        },
+        "mccabe": {
+            "hashes": [],
+            "version": "==0.6.1"
+        },
+        "pylint": {
+            "hashes": [],
+            "version": "==2.1.1"
+        },
         "pytz": {
-            "hashes": [
-                "sha256:a061aa0a9e06881eb8b3b2b43f05b9439d6583c206d0a6c340ff72a7b6669053",
-                "sha256:ffb9ef1de172603304d9d2819af6f5ece76f2e85ec10692a524dd876e72bf277"
-            ],
+            "hashes": [],
             "version": "==2018.5"
+        },
+        "six": {
+            "hashes": [],
+            "version": "==1.11.0"
+        },
+        "typing": {
+            "hashes": [],
+            "version": "==3.6.4"
+        },
+        "wrapt": {
+            "hashes": [],
+            "version": "==1.10.11"
         }
     },
     "develop": {}
