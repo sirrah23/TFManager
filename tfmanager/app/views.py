@@ -19,7 +19,7 @@ def register(request):
     else:
         form = UserCreationForm()
     context = {'form': form}
-    return render(request, 'registration/register.html', context)
+    return render(request, 'auth/register.html', context)
 
 def auth_login(request):
     context = {}
@@ -34,9 +34,9 @@ def auth_login(request):
             return redirect('index')
         else:
             context['error'] = 'Invalid credentials'
-            return render(request, "registration/login.html", context)
+            return render(request, "auth/login.html", context)
     else:
-        return render(request, 'registration/login.html', context)
+        return render(request, 'auth/login.html', context)
 
 def auth_logout(request):
     if request.method == 'POST':
