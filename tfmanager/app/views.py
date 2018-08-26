@@ -1,11 +1,10 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 
 
 def index(request):
     return render(request, 'app/index.html')
-
 
 def register(request):
     if request.method == 'POST':
@@ -21,3 +20,25 @@ def register(request):
         form = UserCreationForm()
     context = {'form': form}
     return render(request, 'registration/register.html', context)
+
+def auth_login(request):
+    context = {}
+    form = AuthenticationForm()
+    context = {'form': form}
+    if request.method == 'POST':
+        username = request.POST['username']
+        password = request.POST['password']
+        user = authenticate(request, username=username, password=password)
+        if user:
+            login(request, user)
+            return redirect('index')
+        else:
+            context['error'] = 'Invalid credentials'
+            return render(request, "registration/login.html", context)
+    else:
+        return render(request, 'registration/login.html', context)
+
+def auth_logout(request):
+    if request.method == 'POST':
+        logout(request)
+        return redirect('login')
