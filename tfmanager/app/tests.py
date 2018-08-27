@@ -129,3 +129,39 @@ class FolderRepoTest(TestCase):
     def test_delete_nonexistent_folder(self):
         stat = FolderRepo.delete_folder(self.user.id, 322)
         self.assertFalse(stat)
+
+    def test_get_user_folders_with_parent_root(self):
+        f1 = FolderRepo.create_folder(self.user.id, 'folder1')
+        f2 = FolderRepo.create_folder(self.user.id, 'folder2')
+        f3 = FolderRepo.create_folder(self.user_two.id, 'folder3')
+        all_f_one = FolderRepo.get_all_folder_for_user_with_parent(self.user.id, None)
+        all_f_two = FolderRepo.get_all_folder_for_user_with_parent(self.user_two.id, None)
+        self.assertEqual(len(all_f_one), 2)
+        self.assertEqual(len(all_f_two), 1)
+        self.assertIn(f1, all_f_one)
+        self.assertIn(f2, all_f_one)
+        self.assertIn(f3, all_f_two)
+
+    def test_get_user_folders_with_mixed_parent(self):
+        f1 = FolderRepo.create_folder(self.user.id, 'folder1')
+        f2 = FolderRepo.create_folder(self.user.id, 'folder2', parent_id=f1['id'])
+        f3 = FolderRepo.create_folder(self.user.id, 'folder3', parent_id=f1['id'])
+        all_f_no_parent = FolderRepo.get_all_folder_for_user_with_parent(self.user.id, None)
+        all_f_parent = FolderRepo.get_all_folder_for_user_with_parent(self.user.id, f1['id'])
+        self.assertEqual(len(all_f_no_parent), 1)
+        self.assertEqual(len(all_f_parent), 2)
+        self.assertIn(f1, all_f_no_parent)
+        self.assertIn(f2, all_f_parent)
+        self.assertIn(f3, all_f_parent)
+
+    def test_get_user_folders_with_mixed_parent(self):
+        f1 = FolderRepo.create_folder(self.user.id, 'folder1')
+        f2 = FolderRepo.create_folder(self.user_two.id, 'folder2')
+        f3 = FolderRepo.create_folder(self.user.id, 'folder3', parent_id=f1['id'])
+        f4 = FolderRepo.create_folder(self.user_two.id, 'folder4', parent_id=f2['id'])
+        all_f_one = FolderRepo.get_all_folder_for_user_with_parent(self.user.id, f1['id'])
+        all_f_two = FolderRepo.get_all_folder_for_user_with_parent(self.user_two.id, f2['id'])
+        self.assertEqual(len(all_f_one), 1)
+        self.assertEqual(len(all_f_two), 1)
+        self.assertIn(f3, all_f_one)
+        self.assertIn(f4, all_f_two)

@@ -24,7 +24,8 @@ class FolderRepo:
 
     @staticmethod
     def get_all_folder_for_user_with_parent(user_id, parent_id):
-        pass
+        folders = Folder.objects.filter(owner_id=user_id, parent_id=parent_id)
+        return [FolderRepo.to_json(folder) for folder in folders]
 
     @staticmethod
     def create_folder(user_id, name, parent_id=None):
