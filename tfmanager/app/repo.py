@@ -1,6 +1,8 @@
 from app.models import Folder
 from django.contrib.auth.models import User
 
+# TODO: Integrity check -- Not allowed to use a different user's folder as the parent to the current user's folder
+
 
 class FolderRepo:
 
@@ -17,7 +19,8 @@ class FolderRepo:
 
     @staticmethod
     def get_all_folder_for_user(user_id):
-        pass
+        folders = Folder.objects.filter(owner_id=user_id)
+        return [FolderRepo.to_json(folder) for folder in folders]
 
     @staticmethod
     def get_all_folder_for_user_with_parent(user_id, parent_id):

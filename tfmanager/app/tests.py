@@ -43,7 +43,10 @@ class FolderRepoTest(TestCase):
         self.client = Client()
         response = self.client.post(
             '/app/register/', {'username': 'nu001', 'password1': '@pass1212', 'password2': '@pass1212'})
-        self.user = User.objects.all().first()
+        self.user = User.objects.all()[0]
+        response = self.client.post(
+            '/app/register/', {'username': 'nu002', 'password1': '@pass1212', 'password2': '@pass1212'})
+        self.user_two = User.objects.all()[1]
 
     def test_create_folder_no_parent_one(self):
         f = FolderRepo.create_folder(self.user.id, 'folder1')
@@ -80,3 +83,35 @@ class FolderRepoTest(TestCase):
         self.assertEqual(f2['owner_id'], self.user.id)
         self.assertEqual(f1['parent_id'], None)
         self.assertEqual(f2['parent_id'], f1['id'])
+
+    def test_get_user_folders(self):
+        f1 = FolderRepo.create_folder(self.user.id, 'folder1')
+        f2 = FolderRepo.create_folder(self.user.id, 'folder2')
+        f3 = FolderRepo.create_folder(self.user.id, 'folder3')
+        all_f = FolderRepo.get_all_folder_for_user(self.user.id)
+        self.assertEqual(len(all_f), 3)
+        self.assertIn(f1, all_f)
+        self.assertIn(f2, all_f)
+        self.assertIn(f3, all_f)
+
+    def test_get_user_folders_some_parents(self):
+        f1 = FolderRepo.create_folder(self.user.id, 'folder1')
+        f2 = FolderRepo.create_folder(self.user.id, 'folder2', parent_id=f1['id'])
+        f3 = FolderRepo.create_folder(self.user.id, 'folder3', parent_id=f2['id'])
+        all_f = FolderRepo.get_all_folder_for_user(self.user.id)
+        self.assertEqual(len(all_f), 3)
+        self.assertIn(f1, all_f)
+        self.assertIn(f2, all_f)
+        self.assertIn(f3, all_f) 
+
+    def test_get_user_folders_multiple_users(self):
+        f1 = FolderRepo.create_folder(self.user.id, 'folder1')
+        f2 = FolderRepo.create_folder(self.user_two.id, 'folder2')
+        f3 = FolderRepo.create_folder(self.user.id, 'folder3', parent_id=f1['id'])
+        all_f_one = FolderRepo.get_all_folder_for_user(self.user.id)
+        all_f_two = FolderRepo.get_all_folder_for_user(self.user_two.id)
+        self.assertEqual(len(all_f_one), 2)
+        self.assertEqual(len(all_f_two), 1)
+        self.assertIn(f1, all_f_one)
+        self.assertIn(f3, all_f_one) 
+        self.assertIn(f2, all_f_two)
