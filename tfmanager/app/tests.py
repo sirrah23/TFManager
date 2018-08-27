@@ -115,3 +115,17 @@ class FolderRepoTest(TestCase):
         self.assertIn(f1, all_f_one)
         self.assertIn(f3, all_f_one) 
         self.assertIn(f2, all_f_two)
+
+    def test_delete_folder(self):
+        f1 = FolderRepo.create_folder(self.user.id, 'folder1')
+        stat = FolderRepo.delete_folder(self.user.id, f1['id'])
+        self.assertTrue(stat)
+
+    def test_delete_not_your_folder(self):
+        f1 = FolderRepo.create_folder(self.user.id, 'folder1')
+        stat = FolderRepo.delete_folder(self.user_two.id, f1['id'])
+        self.assertFalse(stat)
+
+    def test_delete_nonexistent_folder(self):
+        stat = FolderRepo.delete_folder(self.user.id, 322)
+        self.assertFalse(stat)

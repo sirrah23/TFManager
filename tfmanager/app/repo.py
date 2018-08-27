@@ -42,4 +42,8 @@ class FolderRepo:
 
     @staticmethod
     def delete_folder(user_id, folder_id):
-        pass
+        folder = Folder.objects.filter(id=folder_id, owner_id=user_id).first()
+        if not folder:
+            return False
+        folder.delete()
+        return True
