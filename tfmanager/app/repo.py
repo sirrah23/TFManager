@@ -2,6 +2,7 @@ from app.models import Folder
 from django.contrib.auth.models import User
 
 # TODO: Integrity check -- Not allowed to use a different user's folder as the parent to the current user's folder
+# TODO: Use the User model's related_name to get the data instead of digging it up with a filter
 
 
 class FolderRepo:
