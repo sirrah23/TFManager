@@ -204,3 +204,44 @@ class FileRepoTest(TestCase):
         self.assertEqual(test_file['belong_id'], test_folder['id'])
         self.assertEqual(test_file['content_text'], 'Hello, World')
         self.assertEqual(test_file['version'], 0)
+
+    def test_file_create_no_folder(self):
+        nonexistent_folder_id = 322
+        test_file = FileRepo.create_file(
+            self.user.id, nonexistent_folder_id, 'test.txt', 'Hello, World')
+        self.assertIsNone(test_file)
+
+    def test_file_create_already_exists_in_folder(self):
+        test_folder = FolderRepo.create_folder(self.user.id, 'folder1')
+        self.assertIsNotNone(test_folder)
+        test_file_one = FileRepo.create_file(
+            self.user.id, test_folder['id'], 'test.txt', 'Hello, World')
+        self.assertIsNotNone(test_file_one)
+        test_file_two = FileRepo.create_file(
+            self.user.id, test_folder['id'], 'test.txt', 'Hello, World')
+        self.assertIsNone(test_file_two)
+
+    def test_file_create_already_exists_different_folder(self):
+        test_folder_one = FolderRepo.create_folder(self.user.id, 'folder1')
+        test_folder_two = FolderRepo.create_folder(self.user.id, 'folder2')
+        self.assertIsNotNone(test_folder_one)
+        self.assertIsNotNone(test_folder_two)
+        test_file_one = FileRepo.create_file(
+            self.user.id, test_folder_one['id'], 'test.txt', 'Hello, World')
+        self.assertIsNotNone(test_file_one)
+        test_file_two = FileRepo.create_file(
+            self.user.id, test_folder_two['id'], 'test.txt', 'Hello, World')
+        self.assertIsNotNone(test_file_two)
+
+        self.assertEqual(test_file_two['name'], 'test.txt')
+        self.assertEqual(test_file_two['deleted'], False)
+        self.assertIn('creation_time', test_file_two)
+        self.assertEqual(test_file_two['belong_id'], test_folder_two['id'])
+        self.assertEqual(test_file_two['content_text'], 'Hello, World')
+
+    def test_file_create_different_user_folder(self):
+        test_folder = FolderRepo.create_folder(self.user.id, 'folder1')
+        self.assertIsNotNone(test_folder)
+        test_file = FileRepo.create_file(
+            self.user_two.id, test_folder['id'], 'test.txt', 'Hello, World')
+        self.assertIsNone(test_file)

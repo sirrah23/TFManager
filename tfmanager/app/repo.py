@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 
 # TODO: Integrity check -- Not allowed to use a different user's folder as the parent to the current user's folder
 # TODO: Use the User model's related_name to get the data instead of digging it up with a filter
+# TODO: Don't allow same folder to be created twice
 
 
 class FolderRepo:
@@ -68,19 +69,38 @@ class FileRepo:
 
     @staticmethod
     def create_file(user_id, folder_id, name, text):
+
+        # Make sure user and folder exist
         user = User.objects.filter(id=user_id).first()
         folder = Folder.objects.filter(id=folder_id).first()
         if not user or not folder:
             return None
+
+        # Ensure that the input folder is owned by the input user
+        if folder.owner.id != user_id:
+            return None
+
+        # Validate that a file with this name does not already exist
+        owned_file_names = [folder.name for folder in folder.owned_files.all()]
+        if name in owned_file_names:
+            return None
+
+        # Create the new file
         with transaction.atomic():
             new_file = File(name=name, belong=folder)
             new_file.save()
             new_content = Content(text=text, version=0, file=new_file)
             new_content.save()
+
+        # Serialize new file and content to JSON
         return FileRepo.to_json(new_file, new_content)
 
     @staticmethod
     def get_file(user_id, file_id):
+        pass
+
+    @staticmethod
+    def publish_new_version(user_id, file_id, text):
         pass
 
     @staticmethod
