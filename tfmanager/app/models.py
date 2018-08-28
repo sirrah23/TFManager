@@ -18,3 +18,10 @@ class File(models.Model):
     creation_time = models.DateTimeField(auto_now=True)
     belong = models.ForeignKey(
         Folder, on_delete=models.CASCADE, related_name='owned_files', blank=True, null=True)
+
+
+class Content(models.Model):
+    text = models.TextField()
+    version = models.PositiveIntegerField()
+    file = models.ForeignKey(
+        File, on_delete=models.CASCADE, related_name='file_content')
