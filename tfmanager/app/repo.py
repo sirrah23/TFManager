@@ -5,6 +5,7 @@ from django.contrib.auth.models import User
 # TODO: Integrity check -- Not allowed to use a different user's folder as the parent to the current user's folder
 # TODO: Use the User model's related_name to get the data instead of digging it up with a filter
 # TODO: Don't allow same folder to be created twice
+# TODO: Folder deleted -> All files deleted as well
 
 
 class FolderRepo:
@@ -59,6 +60,7 @@ class FileRepo:
     @staticmethod
     def to_json(file, content):
         res = {}
+        res['id'] = file.id
         res['name'] = file.name
         res['deleted'] = file.deleted
         res['creation_time'] = file.creation_time
@@ -97,7 +99,23 @@ class FileRepo:
 
     @staticmethod
     def get_file(user_id, file_id):
-        pass
+        user = User.objects.filter(id=user_id).first()
+        file = File.objects.filter(id=file_id).first()
+
+        # Ensure that input user and file exist
+        if not user or not file:
+            return None
+
+        # Ensure that input file is owned by the input user
+        if file.belong.owner.id != user.id:
+            return None
+
+        # Get the latest version of the file content
+        content = file.file_content.latest('version')
+        if not content:  # Should never happen...
+            return None
+
+        return FileRepo.to_json(file, content)
 
     @staticmethod
     def publish_new_version(user_id, file_id, text):

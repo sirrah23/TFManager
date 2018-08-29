@@ -245,3 +245,20 @@ class FileRepoTest(TestCase):
         test_file = FileRepo.create_file(
             self.user_two.id, test_folder['id'], 'test.txt', 'Hello, World')
         self.assertIsNone(test_file)
+
+    def test_file_get_after_create(self):
+        test_folder = FolderRepo.create_folder(self.user.id, 'folder1')
+        self.assertIsNotNone(test_folder)
+        test_file_create = FileRepo.create_file(
+            self.user.id, test_folder['id'], 'test.txt', 'Hello, World')
+        self.assertIsNotNone(test_file_create)
+
+        # Correct user
+        test_file_get_good = FileRepo.get_file(
+            self.user.id, test_file_create['id'])
+        # Wrong user
+        test_file_get_bad = FileRepo.get_file(
+            self.user_two.id, test_file_create['id'])
+
+        self.assertDictEqual(test_file_get_good, test_file_create)
+        self.assertIsNone(test_file_get_bad)
