@@ -262,3 +262,14 @@ class FileRepoTest(TestCase):
 
         self.assertDictEqual(test_file_get_good, test_file_create)
         self.assertIsNone(test_file_get_bad)
+
+    def test_delete_file_after_create(self):
+        test_folder = FolderRepo.create_folder(self.user.id, 'folder1')
+        self.assertIsNotNone(test_folder)
+        test_file = FileRepo.create_file(
+            self.user.id, test_folder['id'], 'test.txt', 'Hello, World')
+        self.assertIsNotNone(test_file)
+
+        res = FileRepo.delete_file(self.user.id, test_file['id'])
+
+        self.assertEqual(res, True)

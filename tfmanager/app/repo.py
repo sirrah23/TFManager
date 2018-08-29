@@ -123,4 +123,17 @@ class FileRepo:
 
     @staticmethod
     def delete_file(user_id, file_id):
-        pass
+        user = User.objects.filter(id=user_id).first()
+        file = File.objects.filter(id=file_id).first()
+
+        # Ensure that input user and file exist
+        if not user or not file:
+            return False
+
+        # Ensure that input file is owned by the input user
+        if file.belong.owner.id != user.id:
+            return False
+
+        file.deleted = True
+        file.save()
+        return True
