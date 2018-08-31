@@ -3,6 +3,9 @@ from django.contrib.auth.models import User
 from app.repo import FolderRepo, FileRepo
 
 
+# TODO: Remove all login/logout posts with Client login/logout method
+
+
 class RegistrationTest(TestCase):
 
     def setUp(self):
@@ -273,3 +276,50 @@ class FileRepoTest(TestCase):
         res = FileRepo.delete_file(self.user.id, test_file['id'])
 
         self.assertEqual(res, True)
+
+
+class HomepageTest(TestCase):
+
+    def setUp(self):
+        self.client = Client()
+        self.client.post(
+            '/app/register/', {'username': 'nu001', 'password1': '@pass1212', 'password2': '@pass1212'})
+        self.client.logout()
+
+    def test_homepage_get_not_logged_in(self):
+        res = self.client.get('/app/')
+        self.assertEqual(res.status_code, 200)
+        self.assertIn(b'Not authenticated', res.content)
+
+    def test_homepage_is_logged_in_no_folders(self):
+        self.client.login(username='nu001', password='@pass1212')
+        res = self.client.get('/app/')
+        self.assertEqual(res.status_code, 200)
+        self.assertNotIn(b'Not authenticated', res.content)
+        self.client.logout()
+
+    def test_homepage_is_logged_in_two_folders(self):
+        self.client.login(username='nu001', password='@pass1212')
+        user_id = self.client.session['_auth_user_id']
+        FolderRepo.create_folder(user_id, 'folder1')
+        FolderRepo.create_folder(user_id, 'folder2')
+        res = self.client.get('/app/')
+
+        self.assertEqual(res.status_code, 200)
+        self.assertIn(b'folder1', res.content)
+        self.assertIn(b'folder2', res.content)
+
+        self.client.logout()
+
+    def test_homepage_is_logged_in_nested_folders_at_root(self):
+        self.client.login(username='nu001', password='@pass1212')
+        user_id = self.client.session['_auth_user_id']
+        f1 = FolderRepo.create_folder(user_id, 'ParentFolder')
+        f2 = FolderRepo.create_folder(user_id, 'ChildFolder', parent_id=f1['id'])
+        res = self.client.get('/app/')
+
+        self.assertEqual(res.status_code, 200)
+        self.assertIn(b'ParentFolder', res.content)
+        self.assertNotIn(b'ChildFolder', res.content)
+
+        self.client.logout()

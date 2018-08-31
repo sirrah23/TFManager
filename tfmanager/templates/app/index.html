@@ -12,6 +12,13 @@
     <p>Not authenticated</p>
     {% endif %}
     {% if user.is_authenticated %}
+    {% if folders %}
+    <ul>
+    {% for folder in folders %}
+    <li><a href="/folder/{{folder.id}}">{{ folder.name }}<a/></li>
+    {% endfor %}
+    </ul>
+    {% endif %}
     <form method="POST" action="{% url 'logout' %}">
         {% csrf_token %}
         <input type="Submit" value="Logout">
