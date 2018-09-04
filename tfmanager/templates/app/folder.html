@@ -2,17 +2,17 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <!-- TODO: Change this based on whether or not user is already logged in-->
-    <title>Login</title>
+    <title>Folder</title>
 </head>
 <body>
     <h1>TFManager</h1>
-    {% if user.is_authenticated %}
-    <p>Welcome {{ user.username }}</p>
-    {% else %}
+    {% if user.is_authenticated == False %}
     <p>Not authenticated</p>
     {% endif %}
     {% if user.is_authenticated %}
+    {% if name %}
+    <h2>{{name}}</h2>
+    {% endif %}
     {% if folders %}
     <ul>
     {% for folder in folders %}

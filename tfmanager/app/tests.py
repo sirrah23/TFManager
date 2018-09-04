@@ -323,3 +323,42 @@ class HomepageTest(TestCase):
         self.assertNotIn(b'ChildFolder', res.content)
 
         self.client.logout()
+
+    def test_folder_page_empty(self):
+        self.client.login(username='nu001', password='@pass1212')
+        user_id = self.client.session['_auth_user_id']
+        f1 = FolderRepo.create_folder(user_id, 'ParentFolder')
+        f2 = FolderRepo.create_folder(user_id, 'ChildFolder')
+        res = self.client.get('/app/folder/{}/'.format(f1['id']))
+
+        self.assertEqual(res.status_code, 200)
+        self.assertIn(b'<h2>ParentFolder</h2>', res.content)
+        self.assertNotIn(b'ChildFolder', res.content)
+
+        self.client.logout()
+
+
+    def test_folder_page_contains_subfolder(self):
+        self.client.login(username='nu001', password='@pass1212')
+        user_id = self.client.session['_auth_user_id']
+        f1 = FolderRepo.create_folder(user_id, 'ParentFolder')
+        f2 = FolderRepo.create_folder(user_id, 'ChildFolder', parent_id=f1['id'])
+        res = self.client.get('/app/folder/{}/'.format(f1['id']))
+
+        self.assertEqual(res.status_code, 200)
+        self.assertIn(b'<h2>ParentFolder</h2>', res.content)
+        self.assertIn(b'ChildFolder', res.content)
+
+        self.client.logout()
+
+    def test_folder_access_link_directly_empty(self):
+        self.client.login(username='nu001', password='@pass1212')
+        user_id = self.client.session['_auth_user_id']
+        f1 = FolderRepo.create_folder(user_id, 'ParentFolder')
+        f2 = FolderRepo.create_folder(user_id, 'ChildFolder', parent_id=f1['id'])
+        res = self.client.get('/app/folder/{}/'.format(f2['id']))
+
+        self.assertEqual(res.status_code, 200)
+        self.assertIn(b'<h2>ChildFolder</h2>', res.content)
+
+        self.client.logout()

@@ -6,6 +6,7 @@ from django.contrib.auth.models import User
 # TODO: Use the User model's related_name to get the data instead of digging it up with a filter
 # TODO: Don't allow same folder to be created twice
 # TODO: Folder deleted -> All files deleted as well
+# TODO: Test the get_folder method
 
 
 class FolderRepo:
@@ -30,6 +31,13 @@ class FolderRepo:
     def get_all_folder_for_user_with_parent(user_id, parent_id):
         folders = Folder.objects.filter(owner_id=user_id, parent_id=parent_id)
         return [FolderRepo.to_json(folder) for folder in folders]
+
+    @staticmethod
+    def get_folder(user_id, folder_id):
+        folder = Folder.objects.filter(owner_id=user_id, id=folder_id).first()
+        if not folder:
+            return
+        return FolderRepo.to_json(folder)
 
     @staticmethod
     def create_folder(user_id, name, parent_id=None):

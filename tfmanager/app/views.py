@@ -50,3 +50,15 @@ def auth_logout(request):
     if request.method == 'POST':
         logout(request)
         return redirect('login')
+
+def folder(request, folder_id):
+    context = {}
+    current_user = request.user
+    if current_user:
+        folder_info = FolderRepo.get_folder(current_user.id, folder_id)
+        child_folders_info = FolderRepo.get_all_folder_for_user_with_parent(current_user.id, folder_id)
+        if not folder_info:
+            return redirect('index')
+        context['name'] = folder_info['name']
+        context['folders'] = child_folders_info
+    return render(request, 'app/folder.html', context)
