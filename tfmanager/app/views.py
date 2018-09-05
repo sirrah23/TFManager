@@ -1,14 +1,15 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
-from app.repo import FolderRepo
+from app.repo import FolderRepo, FileRepo
 
 
 def index(request):
     context = {}
     current_user = request.user
     if current_user:
-        context['folders'] = FolderRepo.get_all_folder_for_user_with_parent(current_user.id, parent_id=None)
+        context['folders'] = FolderRepo.get_all_folder_for_user_with_parent(
+            current_user.id, parent_id=None)
     return render(request, 'app/index.html', context)
 
 
@@ -51,15 +52,20 @@ def auth_logout(request):
         logout(request)
         return redirect('login')
 
+
 def folder(request, folder_id):
     context = {}
     current_user = request.user
     if current_user:
         folder_info = FolderRepo.get_folder(current_user.id, folder_id)
-        child_folders_info = FolderRepo.get_all_folder_for_user_with_parent(current_user.id, folder_id)
+        child_folders_info = FolderRepo.get_all_folder_for_user_with_parent(
+            current_user.id, folder_id)
+        files_info = FileRepo.get_files_within_folder(
+            current_user.id, folder_id)
         if not folder_info:
             return redirect('index')
         context['name'] = folder_info['name']
         context['parent_id'] = folder_info['parent_id']
+        context['files'] = files_info
         context['folders'] = child_folders_info
     return render(request, 'app/folder.html', context)

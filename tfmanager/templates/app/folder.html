@@ -26,6 +26,13 @@
     {% endfor %}
     </ul>
     {% endif %}
+    {% if files %}
+    <ul>
+    {% for file in files %}
+    <li><a href="/app/file/{{file.id}}/">{{file.name}}</a></li>
+    {% endfor %}
+    </ul>
+    {% endif %}
     <form method="POST" action="{% url 'logout' %}">
         {% csrf_token %}
         <input type="Submit" value="Logout">

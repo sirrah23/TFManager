@@ -277,6 +277,19 @@ class FileRepoTest(TestCase):
 
         self.assertEqual(res, True)
 
+    def test_file_within_folder(self):
+        test_folder = FolderRepo.create_folder(self.user.id, 'folder1')
+        self.assertIsNotNone(test_folder)
+        test_file = FileRepo.create_file(
+            self.user.id, test_folder['id'], 'test.txt', 'Hello, World')
+        test_file_two = FileRepo.create_file(
+            self.user.id, test_folder['id'], 'test2.txt', 'Hello, World Two')
+
+        res = FileRepo.get_files_within_folder(self.user.id, test_folder['id'])
+        self.assertEqual(len(res), 2)
+        self.assertIn(test_file, res)
+        self.assertIn(test_file_two, res)
+
 
 class HomepageTest(TestCase):
 
@@ -315,7 +328,8 @@ class HomepageTest(TestCase):
         self.client.login(username='nu001', password='@pass1212')
         user_id = self.client.session['_auth_user_id']
         f1 = FolderRepo.create_folder(user_id, 'ParentFolder')
-        f2 = FolderRepo.create_folder(user_id, 'ChildFolder', parent_id=f1['id'])
+        f2 = FolderRepo.create_folder(
+            user_id, 'ChildFolder', parent_id=f1['id'])
         res = self.client.get('/app/')
 
         self.assertEqual(res.status_code, 200)
@@ -323,6 +337,7 @@ class HomepageTest(TestCase):
         self.assertNotIn(b'ChildFolder', res.content)
 
         self.client.logout()
+
 
 class FolderPageTest(TestCase):
 
@@ -345,12 +360,12 @@ class FolderPageTest(TestCase):
 
         self.client.logout()
 
-
     def test_folder_page_contains_subfolder(self):
         self.client.login(username='nu001', password='@pass1212')
         user_id = self.client.session['_auth_user_id']
         f1 = FolderRepo.create_folder(user_id, 'ParentFolder')
-        f2 = FolderRepo.create_folder(user_id, 'ChildFolder', parent_id=f1['id'])
+        f2 = FolderRepo.create_folder(
+            user_id, 'ChildFolder', parent_id=f1['id'])
         res = self.client.get('/app/folder/{}/'.format(f1['id']))
 
         self.assertEqual(res.status_code, 200)
@@ -363,7 +378,8 @@ class FolderPageTest(TestCase):
         self.client.login(username='nu001', password='@pass1212')
         user_id = self.client.session['_auth_user_id']
         f1 = FolderRepo.create_folder(user_id, 'ParentFolder')
-        f2 = FolderRepo.create_folder(user_id, 'ChildFolder', parent_id=f1['id'])
+        f2 = FolderRepo.create_folder(
+            user_id, 'ChildFolder', parent_id=f1['id'])
         res = self.client.get('/app/folder/{}/'.format(f2['id']))
 
         self.assertEqual(res.status_code, 200)
@@ -375,11 +391,27 @@ class FolderPageTest(TestCase):
         self.client.login(username='nu001', password='@pass1212')
         user_id = self.client.session['_auth_user_id']
         f1 = FolderRepo.create_folder(user_id, 'ParentFolder')
-        f2 = FolderRepo.create_folder(user_id, 'ChildFolder', parent_id=f1['id'])
+        f2 = FolderRepo.create_folder(
+            user_id, 'ChildFolder', parent_id=f1['id'])
         res = self.client.get('/app/folder/{}/'.format(f2['id']))
 
         self.assertEqual(res.status_code, 200)
         self.assertIn(b'<h2>ChildFolder</h2>', res.content)
-        self.assertIn(bytes('<a href="/app/folder/{}/">'.format(f1['id']), 'utf-8'), res.content)
+        self.assertIn(
+            bytes('<a href="/app/folder/{}/">'.format(f1['id']), 'utf-8'), res.content)
 
         self.client.logout()
+
+    def test_folder_has_files_in_it(self):
+        self.client.login(username='nu001', password='@pass1212')
+        user_id = self.client.session['_auth_user_id']
+        f1 = FolderRepo.create_folder(user_id, 'ParentFolder')
+        f2 = FolderRepo.create_folder(user_id, 'ChildFolder')
+        tf = FileRepo.create_file(
+            user_id, f2['id'], 'test.txt', 'Hello, World')
+        res = self.client.get('/app/folder/{}/'.format(f2['id']))
+
+        self.assertEqual(res.status_code, 200)
+        self.assertIn(b'<h2>ChildFolder</h2>', res.content)
+        self.assertIn(bytes(
+            '<a href="/app/file/{}/">{}</a>'.format(tf['id'], tf['name']), 'utf-8'), res.content)

@@ -87,7 +87,7 @@ class FileRepo:
             return None
 
         # Ensure that the input folder is owned by the input user
-        if folder.owner.id != user_id:
+        if folder.owner.id != user.id:
             return None
 
         # Validate that a file with this name does not already exist
@@ -145,3 +145,14 @@ class FileRepo:
         file.deleted = True
         file.save()
         return True
+
+    @staticmethod
+    def get_files_within_folder(user_id, folder_id):
+        # Get the folder and check it
+        folder = FolderRepo.get_folder(user_id, folder_id)  # TODO: Should I use the Folder model directly?
+        if not folder:
+            return None
+        
+        # Get the files and return the JSON format for each one
+        file_ids = list(map(lambda f: f['id'], File.objects.filter(belong=folder_id).values('id')))
+        return list(map(lambda f: FileRepo.get_file(user_id, f), file_ids))
