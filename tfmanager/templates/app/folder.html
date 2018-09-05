@@ -10,6 +10,12 @@
     <p>Not authenticated</p>
     {% endif %}
     {% if user.is_authenticated %}
+    {% if parent_id %}
+    <a href="/app/folder/{{parent_id}}/">Go up</a>
+    {% else %}
+    <!-- Parent is the root folder i.e. app index -->
+    <a href="/app/">Go up</a>
+    {% endif %}
     {% if name %}
     <h2>{{name}}</h2>
     {% endif %}

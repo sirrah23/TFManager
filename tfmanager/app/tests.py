@@ -362,3 +362,16 @@ class HomepageTest(TestCase):
         self.assertIn(b'<h2>ChildFolder</h2>', res.content)
 
         self.client.logout()
+
+    def test_folder_has_link_to_parent_folder(self):
+        self.client.login(username='nu001', password='@pass1212')
+        user_id = self.client.session['_auth_user_id']
+        f1 = FolderRepo.create_folder(user_id, 'ParentFolder')
+        f2 = FolderRepo.create_folder(user_id, 'ChildFolder', parent_id=f1['id'])
+        res = self.client.get('/app/folder/{}/'.format(f2['id']))
+
+        self.assertEqual(res.status_code, 200)
+        self.assertIn(b'<h2>ChildFolder</h2>', res.content)
+        self.assertIn(bytes('<a href="/app/folder/{}/">'.format(f1['id']), 'utf-8'), res.content)
+
+        self.client.logout()

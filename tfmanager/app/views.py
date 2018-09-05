@@ -60,5 +60,6 @@ def folder(request, folder_id):
         if not folder_info:
             return redirect('index')
         context['name'] = folder_info['name']
+        context['parent_id'] = folder_info['parent_id']
         context['folders'] = child_folders_info
     return render(request, 'app/folder.html', context)
