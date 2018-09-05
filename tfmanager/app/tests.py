@@ -324,6 +324,14 @@ class HomepageTest(TestCase):
 
         self.client.logout()
 
+class FolderPageTest(TestCase):
+
+    def setUp(self):
+        self.client = Client()
+        self.client.post(
+            '/app/register/', {'username': 'nu001', 'password1': '@pass1212', 'password2': '@pass1212'})
+        self.client.logout()
+
     def test_folder_page_empty(self):
         self.client.login(username='nu001', password='@pass1212')
         user_id = self.client.session['_auth_user_id']
