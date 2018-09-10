@@ -290,6 +290,63 @@ class FileRepoTest(TestCase):
         self.assertIn(test_file, res)
         self.assertIn(test_file_two, res)
 
+    def test_file_publish_new_version(self):
+        # GIVEN
+        # ======
+        # Create a new folder
+        test_folder = FolderRepo.create_folder(self.user.id, 'folder1')
+        self.assertIsNotNone(test_folder)
+        # Create a new file
+        test_file = FileRepo.create_file(
+            self.user.id, test_folder['id'], 'test.txt', 'Hello World')
+
+        # WHEN
+        # ====
+        # Publish a new version of the file
+        updated_file = FileRepo.publish_new_version(
+            self.user.id, test_file['id'], 'Bye World')
+
+        # THEN
+        # ====
+        # Make sure the updated file looks good
+        self.assertEqual(updated_file['id'], test_file['id'])
+        self.assertEqual(updated_file['name'], test_file['name'])
+        self.assertEqual(updated_file['content_text'], 'Bye World')
+        self.assertGreater(updated_file['version'], test_file['version'])
+        # Pull the file and make sure it look database contents look good
+        db_file = FileRepo.get_file(self.user.id, test_file['id'])
+        # File should be the same as updated_file
+        self.assertDictEqual(db_file, updated_file)
+
+    def test_file_publish_multiple_new_versions(self):
+        # GIVEN
+        # ======
+        # Create a new folder
+        test_folder = FolderRepo.create_folder(self.user.id, 'folder1')
+        self.assertIsNotNone(test_folder)
+        # Create a new file
+        test_file = FileRepo.create_file(
+            self.user.id, test_folder['id'], 'test.txt', 'Hello World')
+
+        # WHEN
+        # ====
+        # Publish multiple new versions of the file
+        FileRepo.publish_new_version(
+            self.user.id, test_file['id'], 'Bye World1')
+        FileRepo.publish_new_version(
+            self.user.id, test_file['id'], 'Bye World2')
+        FileRepo.publish_new_version(
+            self.user.id, test_file['id'], 'Bye World3')
+
+        # THEN
+        # ====
+        # Make sure the updated file looks good
+        db_file = FileRepo.get_file(self.user.id, test_file['id'])
+        self.assertEqual(db_file['id'], test_file['id'])
+        self.assertEqual(db_file['name'], test_file['name'])
+        self.assertEqual(db_file['content_text'], 'Bye World3')
+        self.assertEqual(db_file['version'], 3)
+
 
 class HomepageTest(TestCase):
 
@@ -439,7 +496,23 @@ class FilePageTest(TestCase):
         self.client.login(username=self.username, password=self.password)
         user_id = self.client.session['_auth_user_id']
         folder = FolderRepo.create_folder(user_id, 'RootFolder')
-        file = FileRepo.create_file(user_id, folder['id'], 'myFile.txt', 'Hello, World')
+        file = FileRepo.create_file(
+            user_id, folder['id'], 'myFile.txt', 'Hello, World')
+        res = self.client.get('/app/file/{}/'.format(file['id']))
+
+        self.assertEqual(res.status_code, 200)
+        self.assertIn(bytes(file['name'], 'utf-8'), res.content)
+        self.assertIn(bytes(file['content_text'], 'utf-8'), res.content)
+
+        self.client.logout()
+
+    def test_file_version_publish(self):
+        self.client.login(username=self.username, password=self.password)
+        user_id = self.client.session['_auth_user_id']
+
+        folder = FolderRepo.create_folder(user_id, 'RootFolder')
+        file = FileRepo.create_file(
+            user_id, folder['id'], 'myFile.txt', 'Hello, World')
         res = self.client.get('/app/file/{}/'.format(file['id']))
 
         self.assertEqual(res.status_code, 200)

@@ -128,7 +128,24 @@ class FileRepo:
 
     @staticmethod
     def publish_new_version(user_id, file_id, text):
-        pass
+        # Get the input file-json and file-object
+        fj = FileRepo.get_file(user_id, file_id)  # File+content (domain level)
+        if not fj:
+            return None
+
+        # Lower level file object for database
+        fo = File.objects.filter(id=file_id).first()
+        if not fo:
+            return None
+
+        # Create a new content object with the input text and file as foreign key
+        c = Content(text=text, version=fj['version'] + 1, file=fo)
+
+        # Save the new version of the file content to the datbase
+        c.save()
+
+        # Return the updated file
+        return FileRepo.to_json(fo, c)
 
     @staticmethod
     def delete_file(user_id, file_id):
@@ -150,10 +167,12 @@ class FileRepo:
     @staticmethod
     def get_files_within_folder(user_id, folder_id):
         # Get the folder and check it
-        folder = FolderRepo.get_folder(user_id, folder_id)  # TODO: Should I use the Folder model directly?
+        # TODO: Should I use the Folder model directly?
+        folder = FolderRepo.get_folder(user_id, folder_id)
         if not folder:
             return None
-        
+
         # Get the files and return the JSON format for each one
-        file_ids = list(map(lambda f: f['id'], File.objects.filter(belong=folder_id).values('id')))
+        file_ids = list(
+            map(lambda f: f['id'], File.objects.filter(belong=folder_id).values('id')))
         return list(map(lambda f: FileRepo.get_file(user_id, f), file_ids))
