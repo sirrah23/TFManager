@@ -73,6 +73,7 @@ class FileRepo:
         res['deleted'] = file.deleted
         res['creation_time'] = file.creation_time
         res['belong_id'] = file.belong.id
+        res['owner'] = file.belong.owner.id  # TODO: Add test for this
         res['content_text'] = content.text
         res['version'] = content.version
         return res

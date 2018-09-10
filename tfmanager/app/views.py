@@ -69,3 +69,15 @@ def folder(request, folder_id):
         context['files'] = files_info
         context['folders'] = child_folders_info
     return render(request, 'app/folder.html', context)
+
+
+def file(request, file_id):
+    context = {}
+    current_user = request.user
+    if current_user:
+        file_info = FileRepo.get_file(current_user.id, file_id)
+        if not file_info:
+            return redirect('index')
+        context['name'] = file_info['name']
+        context['content'] = file_info['content_text']
+    return render(request, 'app/file.html', context)

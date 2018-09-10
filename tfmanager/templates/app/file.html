@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>File</title>
+</head>
+<body>
+    <h1>TFManager</h1>
+    {% if user.is_authenticated == False %}
+    <p>Not authenticated</p>
+    {% endif %}
+    {% if user.is_authenticated %}
+    {% if parent_id %}
+    <a href="/app/folder/{{parent_id}}/">Go up</a>
+    {% else %}
+    <!-- Parent is the root folder i.e. app index -->
+    <a href="/app/">Go up</a>
+    {% endif %}
+    {% if name %}
+    <h2>{{name}}</h2>
+    {% endif %}
+    {% if content %}
+    <div id="filecontent">
+        {{content}}
+    </div>
+    {% endif %}
+    <form method="POST" action="{% url 'logout' %}">
+        {% csrf_token %}
+        <input type="Submit" value="Logout">
+    </form>
+    {% else %}
+    <p><a href="{% url 'login' %}">Sign in</a></p>
+    {% endif %}
+</body>
+</html>

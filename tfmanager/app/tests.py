@@ -415,3 +415,35 @@ class FolderPageTest(TestCase):
         self.assertIn(b'<h2>ChildFolder</h2>', res.content)
         self.assertIn(bytes(
             '<a href="/app/file/{}/">{}</a>'.format(tf['id'], tf['name']), 'utf-8'), res.content)
+
+
+class FilePageTest(TestCase):
+
+    def setUp(self):
+        self.client = Client()
+        self.username = 'nu001'
+        self.password = '@pass1212'
+        self.client.post(
+            '/app/register/', {'username': self.username, 'password1': self.password, 'password2': self.password})
+        self.client.logout()
+
+    def test_file_does_not_exist(self):
+        self.client.login(username=self.username, password=self.password)
+
+        res = self.client.get('/app/file/322')
+        self.assertEqual(res.status_code, 301)
+
+        self.client.logout()
+
+    def test_file_exists(self):
+        self.client.login(username=self.username, password=self.password)
+        user_id = self.client.session['_auth_user_id']
+        folder = FolderRepo.create_folder(user_id, 'RootFolder')
+        file = FileRepo.create_file(user_id, folder['id'], 'myFile.txt', 'Hello, World')
+        res = self.client.get('/app/file/{}/'.format(file['id']))
+
+        self.assertEqual(res.status_code, 200)
+        self.assertIn(bytes(file['name'], 'utf-8'), res.content)
+        self.assertIn(bytes(file['content_text'], 'utf-8'), res.content)
+
+        self.client.logout()
