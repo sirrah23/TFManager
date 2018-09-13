@@ -78,6 +78,37 @@ def file(request, file_id):
         file_info = FileRepo.get_file(current_user.id, file_id)
         if not file_info:
             return redirect('index')
+        context['id'] = file_info['id']
         context['name'] = file_info['name']
         context['content'] = file_info['content_text']
     return render(request, 'app/file.html', context)
+
+
+def file_edit(request, file_id):
+    context = {}
+    current_user = request.user
+    
+    # TODO: Do this consistently across all of the views
+    if not current_user:
+        return render('login')
+
+    # Save the file changes and get the updated file's information
+    if request.method == "POST":
+        new_content = request.POST.get( 'content' )
+        file_info = FileRepo.publish_new_version(current_user.id, file_id, new_content)
+        err_cond = "File publish failed"
+    # Get the file the user requested for edit
+    else:
+        file_info = FileRepo.get_file(current_user.id, file_id)
+        err_cond = "File does not exist"
+
+    # No file information to present...deal with the error
+    if not file_info:
+        context['error'] = err_cond
+    # File contents for user to proceed with editing
+    else:
+        context['id'] = file_info['id']
+        context['name'] = file_info['name']
+        context['content'] = file_info['content_text']
+    
+    return render(request, 'app/file_edit.html', context)

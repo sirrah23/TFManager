@@ -10,5 +10,6 @@ urlpatterns = [
     path('login/', views.auth_login, name='login'),
     path('logout/', views.auth_logout, name='logout'),
     path('folder/<int:folder_id>/', views.folder, name='folder'),
-    path('file/<int:file_id>/', views.file, name='file')
+    path('file/<int:file_id>/', views.file, name='file'),
+    path('file/edit/<int:file_id>/', views.file_edit, name='file_edit')
 ]

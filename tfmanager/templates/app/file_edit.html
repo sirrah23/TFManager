@@ -16,15 +16,21 @@
     <!-- Parent is the root folder i.e. app index -->
     <a href="/app/">Go up</a>
     {% endif %}
+    {% if error %}
+        {{error}}
+    {% endif %}
     {% if name %}
     <h2>{{name}}</h2>
     {% endif %}
     {% if content %}
     <div id="filecontent">
-        {{content}}
+        <textarea name="content" form="filesave">{{content}}</textarea>
+        <form id="filesave" method="POST" action="{% url 'file_edit' id %}"> 
+            {% csrf_token %}
+            <input type="Submit" value="Save">
+        </form>
     </div>
     {% endif %}
-    <a href="{% url 'file_edit' id %}">Edit</a>
     <form method="POST" action="{% url 'logout' %}">
         {% csrf_token %}
         <input type="Submit" value="Logout">
