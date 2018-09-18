@@ -520,3 +520,71 @@ class FilePageTest(TestCase):
         self.assertIn(bytes(file['content_text'], 'utf-8'), res.content)
 
         self.client.logout()
+
+
+class FolderCreatePageTest(TestCase):
+
+    def setUp(self):
+        self.client = Client()
+        self.username = 'nu001'
+        self.password = '@pass1212'
+        self.client.post(
+            '/app/register/', {'username': self.username, 'password1': self.password, 'password2': self.password})
+        self.client.logout()
+
+    def test_create_new_file_at_root(self):
+        self.client.login(username=self.username, password=self.password)
+        user_id = self.client.session['_auth_user_id']
+        res = self.client.post('/app/folder/create/',
+                               {'folder_name': 'myfolder'})
+        folders = FolderRepo.get_all_folder_for_user(user_id)
+
+        # New folder was created
+        self.assertEqual(len(folders), 1)
+        self.assertEqual(folders[0]['name'], 'myfolder')
+        # User was redirected to page for the new folder
+        self.assertRedirects(
+            res, '/app/folder/{}/'.format(folders[0]['id']), status_code=302)
+
+        self.client.logout()
+
+    def test_create_new_file_already_exists(self):
+        self.client.login(username=self.username, password=self.password)
+        user_id = self.client.session['_auth_user_id']
+        res_one = self.client.post(
+            '/app/folder/create/', {'folder_name': 'myfolder'})
+        res_two = self.client.post(
+            '/app/folder/create/', {'folder_name': 'myfolder'})
+        folders = FolderRepo.get_all_folder_for_user(user_id)
+
+        # Only one folder was created, the first one
+        self.assertEqual(len(folders), 1)
+        # res_one was successful
+        self.assertRedirects(
+            res_one, '/app/folder/{}/'.format(folders[0]['id']), status_code=302)
+        # res_two was a failure
+        self.assertEqual(res_two.status_code, 400)
+        self.assertIn(b'Unable to create new folder', res_two.content)
+
+        self.client.logout()
+
+    def test_create_new_file_nonroot_parent(self):
+        self.client.login(username=self.username, password=self.password)
+        user_id = self.client.session['_auth_user_id']
+        res_one = self.client.post(
+            '/app/folder/create/', {'folder_name': 'myfolder'})
+        folders = FolderRepo.get_all_folder_for_user(user_id)
+        res_two = self.client.post(
+            '/app/folder/create/', {'folder_name': 'myfolder', 'parent_id': folders[0]['id']})
+        folders = FolderRepo.get_all_folder_for_user(user_id)
+
+        # Only one folder was created, the first one
+        self.assertEqual(len(folders), 2)
+        # res_one was successful
+        self.assertRedirects(
+            res_one, '/app/folder/{}/'.format(folders[0]['id']), status_code=302)
+        # res_two was a success
+        self.assertRedirects(
+            res_two, '/app/folder/{}/'.format(folders[1]['id']), status_code=302)
+
+        self.client.logout()

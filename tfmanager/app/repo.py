@@ -49,9 +49,13 @@ class FolderRepo:
             parent = Folder.objects.filter(id=parent_id).first()
             if not parent:
                 return None
-        folder = Folder(name=name, owner=user, parent=parent)
-        folder.save()
-        return FolderRepo.to_json(folder)
+        existing_folder = Folder.objects.filter(
+            name=name, owner=user, parent=parent).first()
+        if existing_folder:
+            return None
+        new_folder = Folder(name=name, owner=user, parent=parent)
+        new_folder.save()
+        return FolderRepo.to_json(new_folder)
 
     @staticmethod
     def delete_folder(user_id, folder_id):

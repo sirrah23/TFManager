@@ -64,6 +64,7 @@ def folder(request, folder_id):
             current_user.id, folder_id)
         if not folder_info:
             return redirect('index')
+        context['id'] = folder_info['id']
         context['name'] = folder_info['name']
         context['parent_id'] = folder_info['parent_id']
         context['files'] = files_info
@@ -87,7 +88,7 @@ def file(request, file_id):
 def file_edit(request, file_id):
     context = {}
     current_user = request.user
-    
+
     # TODO: Do this consistently across all of the views
     if not current_user:
         return render('login')
@@ -110,5 +111,25 @@ def file_edit(request, file_id):
         context['id'] = file_info['id']
         context['name'] = file_info['name']
         context['content'] = file_info['content_text']
-    
+
     return render(request, 'app/file_edit.html', context)
+
+def folder_create(request):
+    current_user = request.user
+
+    if not current_user:
+        return render('login')
+
+    if request.method == 'POST':
+        folder_name = request.POST.get('folder_name')
+        parent_id = request.POST.get('parent_id', None)
+        new_folder = FolderRepo.create_folder(current_user.id, folder_name, parent_id)
+        if not new_folder:
+            response = render(request, 'app/folder_create.html', {'error': 'Unable to create new folder'})
+            response.status_code = 400
+        else:
+            response = redirect('folder', new_folder['id'])
+        return response
+    else:
+        parent_id = request.GET.get('parent_id', None)
+        return render(request, 'app/folder_create.html', {'parent_id': parent_id})
