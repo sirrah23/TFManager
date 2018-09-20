@@ -132,25 +132,23 @@ class FileRepo:
 
     @staticmethod
     def publish_new_version(user_id, file_id, text):
-        # Get the input file-json and file-object
-        # TODO: Remove redundant database read
-        fj = FileRepo.get_file(user_id, file_id)  # File+content (domain level)
-        if not fj:
-            return None
-
-        # Lower level file object for database
-        fo = File.objects.filter(id=file_id).first()
+        fo = File.objects.filter(id=file_id, belong__owner__id=user_id).first()
         if not fo:
             return None
 
+        # Grab the latest version of the file content currently stored in database
+        co = fo.file_content.latest('version')
+        if not co:  # Should never happen...
+            return None
+
         # Create a new content object with the input text and file as foreign key
-        c = Content(text=text, version=fj['version'] + 1, file=fo)
+        new_co = Content(text=text, version=co.version + 1, file=fo)
 
         # Save the new version of the file content to the datbase
-        c.save()
+        new_co.save()
 
         # Return the updated file
-        return FileRepo.to_json(fo, c)
+        return FileRepo.to_json(fo, new_co)
 
     @staticmethod
     def delete_file(user_id, file_id):
