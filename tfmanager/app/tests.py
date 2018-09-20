@@ -347,6 +347,39 @@ class FileRepoTest(TestCase):
         self.assertEqual(db_file['content_text'], 'Bye World3')
         self.assertEqual(db_file['version'], 3)
 
+    def test_file_grab_previous_version(self):
+        # GIVEN
+        # ======
+        # Create a new folder
+        test_folder = FolderRepo.create_folder(self.user.id, 'folder1')
+        self.assertIsNotNone(test_folder)
+        # Create a new file
+        test_file = FileRepo.create_file(
+            self.user.id, test_folder['id'], 'test.txt', 'Hello World')
+
+        # WHEN
+        # ====
+        # Publish multiple new versions of the file
+        f1 = FileRepo.publish_new_version(
+            self.user.id, test_file['id'], 'Bye World1')
+        f2 = FileRepo.publish_new_version(
+            self.user.id, test_file['id'], 'Bye World2')
+        f3 = FileRepo.publish_new_version(
+            self.user.id, test_file['id'], 'Bye World3')
+
+        # THEN
+        # ====
+        # Make sure specific versions can be grabbed
+        db_file = FileRepo.get_file_by_version(self.user.id, test_file['id'], f1['version'])
+        self.assertEqual(db_file['content_text'], f1['content_text'])
+        self.assertEqual(db_file['version'], f1['version'])
+        db_file = FileRepo.get_file_by_version(self.user.id, test_file['id'], f2['version'])
+        self.assertEqual(db_file['content_text'], f2['content_text'])
+        self.assertEqual(db_file['version'], f2['version'])
+        db_file = FileRepo.get_file_by_version(self.user.id, test_file['id'], f3['version'])
+        self.assertEqual(db_file['content_text'], f3['content_text'])
+        self.assertEqual(db_file['version'], f3['version'])
+
 
 class HomepageTest(TestCase):
 

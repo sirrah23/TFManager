@@ -133,6 +133,7 @@ class FileRepo:
     @staticmethod
     def publish_new_version(user_id, file_id, text):
         # Get the input file-json and file-object
+        # TODO: Remove redundant database read
         fj = FileRepo.get_file(user_id, file_id)  # File+content (domain level)
         if not fj:
             return None
@@ -180,3 +181,15 @@ class FileRepo:
         file_ids = list(
             map(lambda f: f['id'], File.objects.filter(belong=folder_id).values('id')))
         return list(map(lambda f: FileRepo.get_file(user_id, f), file_ids))
+
+    @staticmethod
+    def get_file_by_version(user_id, file_id, version_num):
+        fo = File.objects.filter(id=file_id, belong__owner__id=user_id).first()
+        if not fo:
+            return None
+
+        co = Content.objects.filter(file=file_id, version=version_num).first()
+        if not co:
+            return None
+
+        return FileRepo.to_json(fo, co)
