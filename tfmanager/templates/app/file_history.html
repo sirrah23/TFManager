@@ -2,10 +2,10 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>File</title>
+    <title>File History</title>
 </head>
 <body>
-    <h1>TFManager</h1>
+    <h1>TFManager File History</h1>
     {% if user.is_authenticated == False %}
     <p>Not authenticated</p>
     {% endif %}
@@ -15,17 +15,23 @@
     {% else %}
     <!-- Parent is the root folder i.e. app index -->
     <a href="/app/">Go up</a>
-    <a href="{% url 'file_hist' id %}">View History</a>
     {% endif %}
     {% if name %}
     <h2>{{name}}</h2>
     {% endif %}
-    {% if content %}
-    <div id="filecontent">
-        {{content}}
-    </div>
-    {% endif %}
-    <a href="{% url 'file_edit' id %}">Edit</a>
+    <ul id="histories">
+    {% for history in histories %}
+        {% if forloop.first %}
+        <li class="history">
+            <a href="{% url 'file' id %}">({{history.version}}) -- {{history.creation_time}} [Current Version]</a>
+        </li>
+        {% else %}
+        <li class="history">
+            <a href="{% url 'file_ver' id history.version %}">({{history.version}}) -- {{history.creation_time}}</a>
+        </li>
+        {% endif %}
+    {% endfor %}
+    </ul>
     <form method="POST" action="{% url 'logout' %}">
         {% csrf_token %}
         <input type="Submit" value="Logout">

@@ -23,5 +23,6 @@ class File(models.Model):
 class Content(models.Model):
     text = models.TextField()
     version = models.PositiveIntegerField()
+    creation_time = models.DateTimeField(auto_now=True)
     file = models.ForeignKey(
         File, on_delete=models.CASCADE, related_name='file_content')

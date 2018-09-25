@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
-from app.repo import FolderRepo, FileRepo
+from app.repo import FolderRepo, FileRepo, FileHistoryRepo
 
 
 def index(request):
@@ -149,3 +149,21 @@ def file_ver(request, file_id, version_num):
     context['name'] = file_info['name']
     context['content'] = file_info['content_text']
     return render(request, 'app/file.html', context)
+
+def file_hist(request, file_id):
+    context = {}
+    
+    current_user = request.user
+    if not current_user:
+        return render('login')
+    
+    history = FileHistoryRepo.get_history(current_user.id, file_id)
+    
+    if not history:
+        return redirect('index')
+    
+    context['id'] = history['id']
+    context['name'] = history['name']
+    context['histories'] = history['histories']
+    
+    return render(request, 'app/file_history.html', context)

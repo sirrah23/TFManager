@@ -191,3 +191,29 @@ class FileRepo:
             return None
 
         return FileRepo.to_json(fo, co)
+
+
+class FileHistoryRepo:
+    
+    @staticmethod
+    def to_json(fo, cos):
+        res = {}
+        res['id'] = fo.id
+        res['name'] = fo.name
+        res['histories'] = [ {k: v for k, v in zip(('creation_time', 'version'),(co.creation_time.strftime("%I:%M%p on %B %d, %Y"), co.version))} for co in cos]
+        return res
+    
+    @staticmethod
+    def get_history(user_id, file_id):
+        fo = File.objects.filter(id=file_id, belong__owner__id=user_id).first()
+
+        # Ensure that input user and file exist
+        if not fo:
+            return None
+
+        # Get the latest version of the file content
+        content = list(Content.objects.filter(file_id=fo.id).order_by('-version'))
+        if not content:  # Should never happen...
+            return None
+
+        return FileHistoryRepo.to_json(fo, content)
