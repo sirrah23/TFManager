@@ -12,5 +12,6 @@ urlpatterns = [
     path('folder/<int:folder_id>/', views.folder, name='folder'),
     path('folder/create/', views.folder_create, name='folder_create'),
     path('file/<int:file_id>/', views.file, name='file'),
-    path('file/edit/<int:file_id>/', views.file_edit, name='file_edit')
+    path('file/edit/<int:file_id>/', views.file_edit, name='file_edit'),
+    path('file/<int:file_id>/version/<int:version_num>/', views.file_ver, name='file_ver')
 ]

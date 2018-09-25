@@ -133,3 +133,19 @@ def folder_create(request):
     else:
         parent_id = request.GET.get('parent_id', None)
         return render(request, 'app/folder_create.html', {'parent_id': parent_id})
+
+def file_ver(request, file_id, version_num):
+    context = {}
+    
+    current_user = request.user
+    if not current_user:
+        return render('login')
+    
+    file_info = FileRepo.get_file_by_version(current_user.id, file_id, version_num)
+    if not file_info:
+        return redirect('index')
+    
+    context['id'] = file_info['id']
+    context['name'] = file_info['name']
+    context['content'] = file_info['content_text']
+    return render(request, 'app/file.html', context)
