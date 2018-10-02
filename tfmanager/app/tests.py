@@ -657,5 +657,27 @@ class FileHistoryPageTest(TestCase):
         self.client.logout()
     
     def test_file_history_multiple_versions(self):
-        # TODO
-        self.assertEqual(3, 4)
+        # Login
+        self.client.login(username=self.username, password=self.password)
+        user_id = self.client.session['_auth_user_id']
+        
+        # Create a folder
+        new_folder = FolderRepo.create_folder(user_id, 'TestFolder')
+        
+        # Place a new file in the above folder
+        new_file = FileRepo.create_file(user_id, new_folder['id'], 'TestFile.txt', 'Hello World')
+        # Publish a new version of the file we just created
+        new_file_ver = FileRepo.publish_new_version(user_id, new_file['id'], "Bye World")
+        
+        # Navigate to the file history page
+        fh_page = self.client.get('/app/file/{}/history/'.format(new_file['id']))
+        
+        # Validate file history page contents
+        self.assertEqual(fh_page.status_code, 200)
+        self.assertIn(b'History', fh_page.content)
+        self.assertIn(bytes(new_file['creation_time'].strftime("%I:%M%p on %B %d, %Y"), 'utf-8'), fh_page.content)
+        self.assertIn(bytes(new_file_ver['creation_time'].strftime("%I:%M%p on %B %d, %Y"), 'utf-8'), fh_page.content)
+        self.assertIn(b'[Current Version]', fh_page.content)
+        
+        #Logout
+        self.client.logout()
