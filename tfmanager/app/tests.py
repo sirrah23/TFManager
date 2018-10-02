@@ -370,13 +370,16 @@ class FileRepoTest(TestCase):
         # THEN
         # ====
         # Make sure specific versions can be grabbed
-        db_file = FileRepo.get_file_by_version(self.user.id, test_file['id'], f1['version'])
+        db_file = FileRepo.get_file_by_version(
+            self.user.id, test_file['id'], f1['version'])
         self.assertEqual(db_file['content_text'], f1['content_text'])
         self.assertEqual(db_file['version'], f1['version'])
-        db_file = FileRepo.get_file_by_version(self.user.id, test_file['id'], f2['version'])
+        db_file = FileRepo.get_file_by_version(
+            self.user.id, test_file['id'], f2['version'])
         self.assertEqual(db_file['content_text'], f2['content_text'])
         self.assertEqual(db_file['version'], f2['version'])
-        db_file = FileRepo.get_file_by_version(self.user.id, test_file['id'], f3['version'])
+        db_file = FileRepo.get_file_by_version(
+            self.user.id, test_file['id'], f3['version'])
         self.assertEqual(db_file['content_text'], f3['content_text'])
         self.assertEqual(db_file['version'], f3['version'])
 
@@ -621,10 +624,10 @@ class FolderCreatePageTest(TestCase):
             res_two, '/app/folder/{}/'.format(folders[1]['id']), status_code=302)
 
         self.client.logout()
-        
+
 
 class FileHistoryPageTest(TestCase):
-    
+
     def setUp(self):
         self.client = Client()
         self.username = 'nu001'
@@ -637,47 +640,127 @@ class FileHistoryPageTest(TestCase):
         # Login
         self.client.login(username=self.username, password=self.password)
         user_id = self.client.session['_auth_user_id']
-        
+
         # Create a folder
         new_folder = FolderRepo.create_folder(user_id, 'TestFolder')
-        
+
         # Place a new file in the above folder
-        new_file = FileRepo.create_file(user_id, new_folder['id'], 'TestFile.txt', 'Hello World')
-        
+        new_file = FileRepo.create_file(
+            user_id, new_folder['id'], 'TestFile.txt', 'Hello World')
+
         # Navigate to the file history page
-        fh_page = self.client.get('/app/file/{}/history/'.format(new_file['id']))
-        
+        fh_page = self.client.get(
+            '/app/file/{}/history/'.format(new_file['id']))
+
         # Validate file history page contents
         self.assertEqual(fh_page.status_code, 200)
         self.assertIn(b'History', fh_page.content)
-        self.assertIn(bytes(new_file['creation_time'].strftime("%I:%M%p on %B %d, %Y"), 'utf-8'), fh_page.content)
+        self.assertIn(bytes(new_file['creation_time'].strftime(
+            "%I:%M%p on %B %d, %Y"), 'utf-8'), fh_page.content)
         self.assertIn(b'[Current Version]', fh_page.content)
-        
-        #Logout
+
+        # Logout
         self.client.logout()
-    
+
     def test_file_history_multiple_versions(self):
         # Login
         self.client.login(username=self.username, password=self.password)
         user_id = self.client.session['_auth_user_id']
-        
+
         # Create a folder
         new_folder = FolderRepo.create_folder(user_id, 'TestFolder')
-        
+
         # Place a new file in the above folder
-        new_file = FileRepo.create_file(user_id, new_folder['id'], 'TestFile.txt', 'Hello World')
+        new_file = FileRepo.create_file(
+            user_id, new_folder['id'], 'TestFile.txt', 'Hello World')
         # Publish a new version of the file we just created
-        new_file_ver = FileRepo.publish_new_version(user_id, new_file['id'], "Bye World")
-        
+        new_file_ver = FileRepo.publish_new_version(
+            user_id, new_file['id'], "Bye World")
+
         # Navigate to the file history page
-        fh_page = self.client.get('/app/file/{}/history/'.format(new_file['id']))
-        
+        fh_page = self.client.get(
+            '/app/file/{}/history/'.format(new_file['id']))
+
         # Validate file history page contents
         self.assertEqual(fh_page.status_code, 200)
         self.assertIn(b'History', fh_page.content)
-        self.assertIn(bytes(new_file['creation_time'].strftime("%I:%M%p on %B %d, %Y"), 'utf-8'), fh_page.content)
-        self.assertIn(bytes(new_file_ver['creation_time'].strftime("%I:%M%p on %B %d, %Y"), 'utf-8'), fh_page.content)
+        self.assertIn(bytes(new_file['creation_time'].strftime(
+            "%I:%M%p on %B %d, %Y"), 'utf-8'), fh_page.content)
+        self.assertIn(bytes(new_file_ver['creation_time'].strftime(
+            "%I:%M%p on %B %d, %Y"), 'utf-8'), fh_page.content)
         self.assertIn(b'[Current Version]', fh_page.content)
-        
-        #Logout
+
+        # Logout
         self.client.logout()
+
+
+class FileCreatePageTest(TestCase):
+
+    def setUp(self):
+        self.client = Client()
+        self.username = 'nu001'
+        self.password = '@pass1212'
+        self.client.post(
+            '/app/register/', {'username': self.username, 'password1': self.password, 'password2': self.password})
+        self.client.logout()
+
+    def test_get_file_create_page_root(self):
+        # Login
+        self.client.login(username=self.username, password=self.password)
+        user_id = self.client.session['_auth_user_id']
+
+        # Navigate to file create page and make sure it is a success
+        fc_page = self.client.get('/app/file/create/')
+
+        # Validate that page was successfully obtained
+        self.assertEqual(fc_page.status_code, 200)
+        self.assertIn(b'Create', fh_page.content)
+        self.assertIn(b'Name', fh_page.content)
+        self.assertIn(b'Text', fh_page.content)
+
+    def test_get_file_page_in_folder(self):
+        # Login
+        self.client.login(username=self.username, password=self.password)
+        user_id = self.client.session['_auth_user_id']
+
+        # Create a folder to house the new file
+        tf = FolderRepo.create_folder(user_id, 'Test')
+
+        # Get a file create page for the new folder
+        fc_page = self.client.get(
+            '/app/file/create/?parent_id={}'.format(tf['id']))
+
+        # Validate that page was successfully obtained
+        self.assertEqual(fc_page.status_code, 200)
+        self.assertIn(b'Create', fh_page.content)
+        self.assertIn(b'Name', fh_page.content)
+
+    def test_create_new_file_root(self):
+         # Login
+        self.client.login(username=self.username, password=self.password)
+        user_id = self.client.session['_auth_user_id']
+
+        # Send a post request to create the file
+        res = self.client.post(
+            '/app/file/create', {'name': 'hello.txt', 'text': 'Hello World'})
+
+        # Validate that we got redirected to the root of the app
+        self.assertRedirects(res, '/app/', status_code = 302)
+        # Validate that the app contains the new file
+        self.assertIn(b'hello.txt', res.content)
+
+    def test_create_new_file_in_folder(self):
+         # Login
+        self.client.login(username = self.username, password = self.password)
+        user_id=self.client.session['_auth_user_id']
+
+        # Create a folder to house the new file
+        tf=FolderRepo.create_folder(user_id, 'Test')
+        # Send a post request to create the file
+        res=self.client.post(
+            '/app/file/create', {'name': 'hello.txt', 'text': 'Hello World', 'parent_id': tf['id']})
+
+        # Validate that we got redirected to the root of the app
+        self.assertRedirects(res, '/app/folder/{}'.format(tf['id']), status_code=302)
+        # Validate that the app contains the new file
+        self.assertIn(b'hello.txt', res.content)
