@@ -167,3 +167,16 @@ def file_hist(request, file_id):
     context['histories'] = history['histories']
     
     return render(request, 'app/file_history.html', context)
+
+def file_create(request):
+    current_user = request.user
+
+    if not current_user:
+        return render('login')
+
+    if request.method == 'POST':
+        # TODO
+        pass
+    else:
+        parent_id = request.GET.get('parent_id', None)
+        return render(request, 'app/file_create.html', {'parent_id': parent_id})

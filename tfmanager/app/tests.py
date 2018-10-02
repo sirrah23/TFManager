@@ -714,9 +714,9 @@ class FileCreatePageTest(TestCase):
 
         # Validate that page was successfully obtained
         self.assertEqual(fc_page.status_code, 200)
-        self.assertIn(b'Create', fh_page.content)
-        self.assertIn(b'Name', fh_page.content)
-        self.assertIn(b'Text', fh_page.content)
+        self.assertIn(b'Create', fc_page.content)
+        self.assertIn(b'Filename', fc_page.content)
+        self.assertIn(b'Text', fc_page.content)
 
     def test_get_file_page_in_folder(self):
         # Login
@@ -732,8 +732,8 @@ class FileCreatePageTest(TestCase):
 
         # Validate that page was successfully obtained
         self.assertEqual(fc_page.status_code, 200)
-        self.assertIn(b'Create', fh_page.content)
-        self.assertIn(b'Name', fh_page.content)
+        self.assertIn(b'Create', fc_page.content)
+        self.assertIn(b'Filename', fc_page.content)
 
     def test_create_new_file_root(self):
          # Login

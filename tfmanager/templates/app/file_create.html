@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Folder</title>
+</head>
+<body>
+    <h1>TFManager</h1>
+    {% if user.is_authenticated == False %}
+    <p>Not authenticated</p>
+    {% endif %}
+    {% if user.is_authenticated %}
+    {% if error %}
+        {{error}}
+    {% endif %}
+    <div id='file_create'>
+        <form method="POST", id="file_form", action="{% url 'folder_create' %}">
+            {% csrf_token %}
+            <input type="text" name="file_name" placeholder="Filename">
+            <input type="text" name="file_name" placeholder="Text">
+            {% if parent_id %}
+            <input type="hidden" name="parent_id" value={{parent_id}}>
+            {% endif %}
+            <input type="Submit" value="Create">
+        </form>
+        <textarea name="text" form="file_form">Text...</textarea> 
+    </div>
+    <form method="POST" action="{% url 'logout' %}">
+        {% csrf_token %}
+        <input type="Submit" value="Logout">
+    </form>
+    {% else %}
+    <p><a href="{% url 'login' %}">Sign in</a></p>
+    {% endif %}
+</body>
+</html>

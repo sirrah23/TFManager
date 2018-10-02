@@ -14,5 +14,6 @@ urlpatterns = [
     path('file/<int:file_id>/', views.file, name='file'),
     path('file/edit/<int:file_id>/', views.file_edit, name='file_edit'),
     path('file/<int:file_id>/version/<int:version_num>/', views.file_ver, name='file_ver'),
-    path('file/<int:file_id>/history/', views.file_hist, name='file_hist')
+    path('file/<int:file_id>/history/', views.file_hist, name='file_hist'),
+    path('file/create/', views.file_create, name='file_create')
 ]
