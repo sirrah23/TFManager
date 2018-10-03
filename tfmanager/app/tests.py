@@ -745,22 +745,23 @@ class FileCreatePageTest(TestCase):
             '/app/file/create', {'name': 'hello.txt', 'text': 'Hello World'})
 
         # Validate that we got redirected to the root of the app
-        self.assertRedirects(res, '/app/', status_code = 302)
+        self.assertRedirects(res, '/app/', status_code=302)
         # Validate that the app contains the new file
         self.assertIn(b'hello.txt', res.content)
 
     def test_create_new_file_in_folder(self):
          # Login
-        self.client.login(username = self.username, password = self.password)
-        user_id=self.client.session['_auth_user_id']
+        self.client.login(username=self.username, password=self.password)
+        user_id = self.client.session['_auth_user_id']
 
         # Create a folder to house the new file
-        tf=FolderRepo.create_folder(user_id, 'Test')
+        tf = FolderRepo.create_folder(user_id, 'Test')
         # Send a post request to create the file
-        res=self.client.post(
+        res = self.client.post(
             '/app/file/create', {'name': 'hello.txt', 'text': 'Hello World', 'parent_id': tf['id']})
 
         # Validate that we got redirected to the root of the app
-        self.assertRedirects(res, '/app/folder/{}'.format(tf['id']), status_code=302)
+        self.assertRedirects(
+            res, '/app/folder/{}'.format(tf['id']), status_code=302)
         # Validate that the app contains the new file
         self.assertIn(b'hello.txt', res.content)
