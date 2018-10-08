@@ -17,7 +17,8 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='File',
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('id', models.AutoField(auto_created=True,
+                                        primary_key=True, serialize=False, verbose_name='ID')),
                 ('name', models.CharField(max_length=50)),
                 ('deleted', models.BooleanField(default=False)),
                 ('creation_time', models.DateTimeField(auto_now=True)),
@@ -26,17 +27,21 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Folder',
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('id', models.AutoField(auto_created=True,
+                                        primary_key=True, serialize=False, verbose_name='ID')),
                 ('name', models.CharField(max_length=50)),
                 ('deleted', models.BooleanField(default=False)),
                 ('creation_time', models.DateTimeField(auto_now=True)),
-                ('folder', models.ForeignKey(blank=True, on_delete=django.db.models.deletion.CASCADE, related_name='parent_folder', to='app.Folder')),
-                ('owner', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='owner', to=settings.AUTH_USER_MODEL)),
+                ('folder', models.ForeignKey(blank=True, on_delete=django.db.models.deletion.CASCADE,
+                                             related_name='parent_folder', to='app.Folder')),
+                ('owner', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE,
+                                            related_name='owner', to=settings.AUTH_USER_MODEL)),
             ],
         ),
         migrations.AddField(
             model_name='file',
             name='folder',
-            field=models.ForeignKey(blank=True, on_delete=django.db.models.deletion.CASCADE, related_name='belong_folder', to='app.Folder'),
+            field=models.ForeignKey(blank=True, on_delete=django.db.models.deletion.CASCADE,
+                                    related_name='belong_folder', to='app.Folder'),
         ),
     ]

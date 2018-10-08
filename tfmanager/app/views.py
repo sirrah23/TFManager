@@ -183,8 +183,16 @@ def file_create(request):
         return render('login')
 
     if request.method == 'POST':
-        # TODO
-        pass
-    else:
-        parent_id = request.GET.get('parent_id', None)
-        return render(request, 'app/file_create.html', {'parent_id': parent_id})
+        name = request.POST.get('name')
+        text = request.POST.get('text')
+        parent_id = request.POST.get('parent_id', None)
+        new_file = FileRepo.create_file(current_user.id, parent_id, name, text)
+        if not new_file:
+            response = render(request, 'app/file_create.html',
+                              {'error': 'Unable to create new folder'})
+            response.status_code = 400
+        else:
+            response = redirect('folder', parent_id)
+        return response
+    parent_id = request.GET.get('parent_id', None)
+    return render(request, 'app/file_create.html', {'parent_id': parent_id})

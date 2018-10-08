@@ -15,16 +15,19 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='file',
             name='belong',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='owned_files', to='app.Folder'),
+            field=models.ForeignKey(
+                blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='owned_files', to='app.Folder'),
         ),
         migrations.AlterField(
             model_name='folder',
             name='owner',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='owned_folders', to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE,
+                                    related_name='owned_folders', to=settings.AUTH_USER_MODEL),
         ),
         migrations.AlterField(
             model_name='folder',
             name='parent',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='child_folders', to='app.Folder'),
+            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE,
+                                    related_name='child_folders', to='app.Folder'),
         ),
     ]

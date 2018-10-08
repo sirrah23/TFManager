@@ -14,10 +14,9 @@
         {{error}}
     {% endif %}
     <div id='file_create'>
-        <form method="POST", id="file_form", action="{% url 'folder_create' %}">
+        <form method="POST", id="file_form", action="{% url 'file_create' %}">
             {% csrf_token %}
-            <input type="text" name="file_name" placeholder="Filename">
-            <input type="text" name="file_name" placeholder="Text">
+            <input type="text" name="name" placeholder="Filename">
             {% if parent_id %}
             <input type="hidden" name="parent_id" value={{parent_id}}>
             {% endif %}

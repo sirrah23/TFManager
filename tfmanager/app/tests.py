@@ -718,6 +718,9 @@ class FileCreatePageTest(TestCase):
         self.assertIn(b'Filename', fc_page.content)
         self.assertIn(b'Text', fc_page.content)
 
+        # Logout
+        self.client.logout()
+
     def test_get_file_page_in_folder(self):
         # Login
         self.client.login(username=self.username, password=self.password)
@@ -735,6 +738,9 @@ class FileCreatePageTest(TestCase):
         self.assertIn(b'Create', fc_page.content)
         self.assertIn(b'Filename', fc_page.content)
 
+        # Logout
+        self.client.logout()
+
     def test_create_new_file_root(self):
          # Login
         self.client.login(username=self.username, password=self.password)
@@ -742,12 +748,15 @@ class FileCreatePageTest(TestCase):
 
         # Send a post request to create the file
         res = self.client.post(
-            '/app/file/create', {'name': 'hello.txt', 'text': 'Hello World'})
+            '/app/file/create/', {'name': 'hello.txt', 'text': 'Hello World'})
 
         # Validate that we got redirected to the root of the app
         self.assertRedirects(res, '/app/', status_code=302)
         # Validate that the app contains the new file
         self.assertIn(b'hello.txt', res.content)
+
+        # Logout
+        self.client.logout()
 
     def test_create_new_file_in_folder(self):
          # Login
@@ -758,10 +767,15 @@ class FileCreatePageTest(TestCase):
         tf = FolderRepo.create_folder(user_id, 'Test')
         # Send a post request to create the file
         res = self.client.post(
-            '/app/file/create', {'name': 'hello.txt', 'text': 'Hello World', 'parent_id': tf['id']})
+            '/app/file/create/', {'name': 'hello.txt', 'text': 'Hello World', 'parent_id': tf['id']})
 
         # Validate that we got redirected to the root of the app
         self.assertRedirects(
-            res, '/app/folder/{}'.format(tf['id']), status_code=302)
-        # Validate that the app contains the new file
+            res, '/app/folder/{}/'.format(tf['id']), status_code=302)
+
+        # Validate that the folder contains the file
+        res = self.client.get('/app/folder/{}/'.format(tf['id']))
         self.assertIn(b'hello.txt', res.content)
+
+        # Logout
+        self.client.logout()
