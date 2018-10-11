@@ -741,23 +741,6 @@ class FileCreatePageTest(TestCase):
         # Logout
         self.client.logout()
 
-    def test_create_new_file_root(self):
-         # Login
-        self.client.login(username=self.username, password=self.password)
-        user_id = self.client.session['_auth_user_id']
-
-        # Send a post request to create the file
-        res = self.client.post(
-            '/app/file/create/', {'name': 'hello.txt', 'text': 'Hello World'})
-
-        # Validate that we got redirected to the root of the app
-        self.assertRedirects(res, '/app/', status_code=302)
-        # Validate that the app contains the new file
-        self.assertIn(b'hello.txt', res.content)
-
-        # Logout
-        self.client.logout()
-
     def test_create_new_file_in_folder(self):
          # Login
         self.client.login(username=self.username, password=self.password)
