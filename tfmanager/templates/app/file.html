@@ -11,10 +11,10 @@
     {% endif %}
     {% if user.is_authenticated %}
     {% if parent_id %}
-    <a href="/app/folder/{{parent_id}}/">Go up</a>
+    <a href="{% url 'folder' parent_id %}/app/folder/{{parent_id}}/">Go up</a>
     {% else %}
     <!-- Parent is the root folder i.e. app index -->
-    <a href="/app/">Go up</a>
+    <a href="{% url 'index' %}">Go up</a>
     <a href="{% url 'file_hist' id %}">View History</a>
     {% endif %}
     {% if name %}

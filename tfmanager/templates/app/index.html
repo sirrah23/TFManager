@@ -13,11 +13,11 @@
     <p>Not authenticated</p>
     {% endif %}
     {% if user.is_authenticated %}
-    <a href="/app/folder/create/">Create new folder</a>
+    <a href="{% url 'folder_create' %}">Create new folder</a>
     {% if folders %}
     <ul>
     {% for folder in folders %}
-    <li><a href="/app/folder/{{folder.id}}/">{{ folder.name }}<a/></li>
+    <li><a href="{% url 'folder' folder.id %}">{{ folder.name }}<a/></li>
     {% endfor %}
     </ul>
     {% endif %}

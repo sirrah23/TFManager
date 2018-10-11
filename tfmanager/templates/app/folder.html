@@ -14,7 +14,7 @@
     <span id="parent_link"><a href="{% url 'folder' parent_id %}">Go up</a></span>
     {% else %}
     <!-- Parent is the root folder i.e. app index -->
-    <span id="parent_link"><a href="/app/">Go up</a></span>
+    <span id="parent_link"><a href="{% url 'index' %}">Go up</a></span>
     {% endif %}
     <span id="create_folder_link"><a href="{% url 'folder_create' %}?parent_id={{id}}">Create new folder</a></span>
     <span id="create_file_link"><a href="{% url 'file_create' %}?parent_id={{id}}">Create new file</a></span>
