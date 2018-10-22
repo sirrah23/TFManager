@@ -24,12 +24,10 @@
     {% if folders %}
     <ul>
     {% for folder in folders %}
-    <li><a href="{% url 'folder' folder.id %}">{{ folder.name }}<a/></li>
+    <li><a href="{% url 'folder' folder.id %}">{{ folder.name }}/<a/></li>
     {% endfor %}
-    </ul>
     {% endif %}
     {% if files %}
-    <ul>
     {% for file in files %}
     <li><a href="{% url 'file' file.id %}">{{file.name}}</a></li>
     {% endfor %}

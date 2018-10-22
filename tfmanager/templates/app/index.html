@@ -13,7 +13,7 @@
     {% if folders %}
     <ul>
         {% for folder in folders %}
-        <li><a href="{% url 'folder' folder.id %}">{{ folder.name }}<a /></li>
+        <li><a href="{% url 'folder' folder.id %}">{{ folder.name }}/<a /></li>
         {% endfor %}
     </ul>
     {% endif %}
