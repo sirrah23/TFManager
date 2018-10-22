@@ -30,9 +30,7 @@
                         aria-haspopup="true" aria-expanded="false">
                         Actions
                     </a>
-                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <a class="dropdown-item" href="{% url 'folder_create' %}">Create folder</a>
-                    </div>
+                    {% block dropdown %}{% endblock %}
                 </li>
             </ul>
             <form method="POST" action="{% url 'logout' %}" class="form-inline my-2 my-lg-0">

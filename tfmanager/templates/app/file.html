@@ -1,6 +1,13 @@
 {% extends "app/base.html" %}
+
+{% block dropdown %}
+<div class="dropdown-menu" aria-labelledby="navbarDropdown">
+    <a class="dropdown-item" href="{% url 'file_edit' id %}">Edit</a>
+    <a class="dropdown-item" href="{% url 'file_hist' id %}">View History</a>
+</div>
+{% endblock %}
+
 {% block content %}
-    <h1>TFManager</h1>
     {% if user.is_authenticated == False %}
     <p>Not authenticated</p>
     {% endif %}
@@ -10,7 +17,6 @@
     {% else %}
     <!-- Parent is the root folder i.e. app index -->
     <a href="{% url 'index' %}">Go up</a>
-    <a href="{% url 'file_hist' id %}">View History</a>
     {% endif %}
     {% if name %}
     <h2>{{name}}</h2>
@@ -20,7 +26,6 @@
         {{content}}
     </div>
     {% endif %}
-    <a href="{% url 'file_edit' id %}">Edit</a>
     <form method="POST" action="{% url 'logout' %}">
         {% csrf_token %}
         <input type="Submit" value="Logout">

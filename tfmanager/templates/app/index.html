@@ -1,5 +1,12 @@
 {% extends "app/base.html" %}
 
+
+{% block dropdown %}
+    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+        <a class="dropdown-item" href="{% url 'folder_create' %}">Create folder</a>
+    </div>
+{% endblock %}
+
 {% block content %}
 <div class="starter-template">
     <p class="lead">Welcome {{ user.username }}</p>
