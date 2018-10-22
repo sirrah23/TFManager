@@ -1,10 +1,5 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>File</title>
-</head>
-<body>
+{% extends "app/base.html" %}
+{% block content %}
     <h1>TFManager</h1>
     {% if user.is_authenticated == False %}
     <p>Not authenticated</p>
@@ -38,5 +33,4 @@
     {% else %}
     <p><a href="{% url 'login' %}">Sign in</a></p>
     {% endif %}
-</body>
-</html>
+{% endblock %}
