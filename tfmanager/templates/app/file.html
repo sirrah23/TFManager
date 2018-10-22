@@ -26,10 +26,6 @@
         {{content}}
     </div>
     {% endif %}
-    <form method="POST" action="{% url 'logout' %}">
-        {% csrf_token %}
-        <input type="Submit" value="Logout">
-    </form>
     {% else %}
     <p><a href="{% url 'login' %}">Sign in</a></p>
     {% endif %}

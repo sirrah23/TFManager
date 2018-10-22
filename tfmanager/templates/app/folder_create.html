@@ -17,10 +17,6 @@
             <input type="Submit" value="Create">
         </form>
     </div>
-    <form method="POST" action="{% url 'logout' %}">
-        {% csrf_token %}
-        <input type="Submit" value="Logout">
-    </form>
     {% else %}
     <p><a href="{% url 'login' %}">Sign in</a></p>
     {% endif %}
